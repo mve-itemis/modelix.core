@@ -26,6 +26,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.forwardedheaders.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.thymeleaf.*
 import io.ktor.server.websocket.*
 import kotlinx.html.a
 import kotlinx.html.body
@@ -49,6 +50,7 @@ import org.modelix.model.server.store.IgniteStoreClient
 import org.modelix.model.server.store.InMemoryStoreClient
 import org.modelix.model.server.store.LocalModelClient
 import org.slf4j.LoggerFactory
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -151,6 +153,13 @@ object Main {
                     allowMethod(HttpMethod.Get)
                     allowMethod(HttpMethod.Put)
                     allowMethod(HttpMethod.Post)
+                }
+                install(Thymeleaf) {
+                    setTemplateResolver(ClassLoaderTemplateResolver().apply {
+                        prefix = "templates/"
+                        suffix = ".html"
+                        characterEncoding = "utf-8"
+                    })
                 }
 
                 modelServer.init(this)
