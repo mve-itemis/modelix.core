@@ -40,11 +40,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.ignite.Ignition
 import org.modelix.authorization.KeycloakUtils
 import org.modelix.authorization.installAuthentication
-import org.modelix.model.server.handlers.HistoryHandler
-import org.modelix.model.server.handlers.DeprecatedLightModelServer
-import org.modelix.model.server.handlers.KeyValueLikeModelServer
-import org.modelix.model.server.handlers.ModelReplicationServer
-import org.modelix.model.server.handlers.RepositoriesManager
+import org.modelix.model.server.handlers.*
 import org.modelix.model.server.store.IStoreClient
 import org.modelix.model.server.store.IgniteStoreClient
 import org.modelix.model.server.store.InMemoryStoreClient
@@ -136,6 +132,7 @@ object Main {
 
             val historyHandler = HistoryHandler(localModelClient)
             val jsonModelServer = DeprecatedLightModelServer(localModelClient)
+            val contentExplorer = ContentExplorer(localModelClient)
             val repositoriesManager = RepositoriesManager(localModelClient)
             val modelReplicationServer = ModelReplicationServer(repositoriesManager)
             val ktorServer: NettyApplicationEngine = embeddedServer(Netty, port = port) {
@@ -164,6 +161,7 @@ object Main {
 
                 modelServer.init(this)
                 historyHandler.init(this)
+                contentExplorer.init(this)
                 jsonModelServer.init(this)
                 modelReplicationServer.init(this)
                 routing {

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang=en xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset=utf-8>
+    <title>Model Explorer</title>
+</head>
+<body>
+<h1>Nodes</h1>
+<div th:each="node : ${childNodes}">
+    <div th:replace="fragments/node_item :: nodeItem (node=${node})">
+        <span>[PlaceHolder]</span>
+    </div>
+</div>
+</body>
+</html>

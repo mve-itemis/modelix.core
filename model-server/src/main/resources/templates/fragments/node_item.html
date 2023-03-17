@@ -1,0 +1,19 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <div th:fragment="nodeItem (node)">
+        <h2 th:text="${node}">node</h2>
+        <h3>vals</h3>
+        <ul>
+            <li th:each="propertyRole : ${node.getPropertyRoles}">
+                <b th:text="${propertyRole}">propertyRole</b>
+                <i th:text="${node.getPropertyValue(propertyRole)}">value</i>
+            </li>
+        </ul>
+        <h3>refs</h3>
+        <ul>
+            <li th:each="referenceRole : ${node.getReferenceRoles}">
+                <b th:text="${referenceRole}">referenceRole</b>
+                <i th:text="${node.getReferenceTargetRef(referenceRole)}">target</i>
+            </li>
+        </ul>
+    </div>
+</html>
