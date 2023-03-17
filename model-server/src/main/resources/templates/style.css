@@ -1,0 +1,70 @@
+body {
+    font-family: sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+  font-family: sans-serif;
+  font-size: 0.9em;
+  border-radius:6px;
+}
+thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+th {
+  padding: 12px 15px;
+}
+td {
+  padding: 3px 15px;
+}
+tbody tr {
+  border-bottom: 1px solid #dddddd;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
+}
+tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+tbody tr:last-of-type
+  border-bottom: 2px solid #009879;
+}
+tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
+ul {
+  padding-left: 15px;
+}
+.expander::before {
+    content: "\25B6";
+    color: black;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.expander {
+    cursor: pointer;
+    font-weight: bold;
+}
+.expander-expanded::before {
+    transition: .1s linear;
+    transform: rotate(90deg);
+}
+.nodeItem {
+    margin-left: 15px;
+}
+.nodeContent {
+    margin-left: 20px;
+}
+.nested {
+    display: none;
+}
+.active {
+    display: block;
+}
+.nodeTree {
+    list-style-type: none;
+    margin-top: 5px;
+}

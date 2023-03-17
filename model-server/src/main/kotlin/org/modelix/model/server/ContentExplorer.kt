@@ -11,6 +11,7 @@ import org.modelix.model.client.IModelClient
 import org.modelix.model.lazy.CLVersion
 import org.modelix.model.lazy.RepositoryId
 import org.modelix.model.metameta.MetaModelBranch
+import java.io.File
 
 class ContentExplorer(private val client: IModelClient) {
 
@@ -50,22 +51,15 @@ class ContentExplorer(private val client: IModelClient) {
                     }
 
                     val rootNode = PNodeAdapter(ITree.ROOT_ID, TreePointer(version.tree))
-                    nodeList.addAll(getAllNodesRecursively(rootNode))
+                    nodeList.add(rootNode)
                 }
 
-                model["childNodes"] = nodeList
+                model["rootNodes"] = nodeList
                 call.respond(ThymeleafContent("content_explorer", model))
+            }
+            get("/content/style.css") {
+                call.respondFile(File("src/main/resources/templates/style.css"))
             }
         }
     }
-}
-
-
-private fun getAllNodesRecursively(rootNode: INode) : List<INode> {
-    val result = mutableListOf(rootNode)
-    val children = rootNode.allChildren
-    for (child in children) {
-        result.addAll(getAllNodesRecursively(child))
-    }
-    return result
 }
