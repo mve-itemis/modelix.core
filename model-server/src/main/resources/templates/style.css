@@ -1,7 +1,6 @@
 body {
     font-family: sans-serif;
 }
-
 table {
   border-collapse: collapse;
   font-family: sans-serif;
@@ -14,10 +13,10 @@ thead tr {
   text-align: left;
 }
 th {
-  padding: 12px 15px;
+  padding: 8px 10px;
 }
 td {
-  padding: 3px 15px;
+  padding: 5px 10px;
 }
 tbody tr {
   border-bottom: 1px solid #dddddd;
@@ -34,29 +33,30 @@ tbody tr.active-row {
   font-weight: bold;
   color: #009879;
 }
-ul {
-  padding-left: 15px;
-}
 .expander::before {
     content: "\25B6";
     color: black;
     display: inline-block;
     margin-right: 6px;
 }
-
 .expander {
     cursor: pointer;
-    font-weight: bold;
+    padding: 6px 12px;
+    font-size: 12pt;
 }
+
+.expander > span {
+    margin-left: 25px;
+    font-size: 9pt;
+}
+
 .expander-expanded::before {
     transition: .1s linear;
     transform: rotate(90deg);
 }
-.nodeItem {
-    margin-left: 15px;
-}
 .nodeContent {
-    margin-left: 20px;
+    margin-left: 15px;
+    margin-top: 10px;
 }
 .nested {
     display: none;
@@ -66,5 +66,23 @@ ul {
 }
 .nodeTree {
     list-style-type: none;
+    margin: 5px 0px;
+}
+.nodeContent > table {
+    margin-left: 22px;
+}
+.treeRoot {
+    list-style-type: none;
+    margin: 5px;
+}
+.referenceRoles {
     margin-top: 5px;
+}
+.nodeItem {
+    border-left: 1px solid #999999;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.nameField {
+    display: inline;
 }

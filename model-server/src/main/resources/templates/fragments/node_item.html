@@ -1,44 +1,50 @@
 <html xmlns:th="http://www.w3.org/1999/xhtml">
     <head>
-        <link rel="stylesheet" type="text/css" href="../styles/style.css">
+        <link rel="stylesheet" type="text/css" href="../style.css">
     </head>
     <ul>
         <li class="nodeItem" th:fragment="nodeItem (node)">
-            <a class="expander" th:text="${node}">node</a>
-            <span th:if="${node.getConceptReference() != null}" th:text="${'concept ref: ' + node.getConceptReference().getUID()}">conceptReference</span>
-            <div class="nodeContent">
-                <div th:with="nodeEmpty=${node.getPropertyRoles().isEmpty && node.getReferenceRoles.isEmpty}">
-                    <div th:if="${nodeEmpty}">
-                        No roles.
-                    </div>
-                    <table class="nested" th:if="${!nodeEmpty}">
-                        <thead>
-                            <tr>
-                                <th>PropertyRole</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tr th:each="propertyRole : ${node.getPropertyRoles}">
-                            <td th:text="${propertyRole}">role</td>
-                            <td th:text="${node.getPropertyValue(propertyRole)}">value</td>
-                        </tr>
-                        <thead>
-                            <tr>
-                                <th>ReferenceRole</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tr th:each="referenceRole : ${node.getReferenceRoles}">
-                            <td th:text="${referenceRole}">referenceRole</td>
-                            <td th:text="${node.getReferenceTargetRef(referenceRole)}">target</td>
-                        </tr>
-                    </table>
-                    <ul class="nodeTree" th:each="child : ${node.allChildren}">
-                        <li th:replace="fragments/node_item :: nodeItem (${child})">child</li>
-                    </ul>
+            <div class="expander">
+                <div class="nameField" th:with="hasName=${#lists.contains(node.getPropertyRoles, 'name')}">
+                    <b th:text="${node}">node</b> <b th:if="${hasName}" th:text="' (' + ${node.getPropertyValue('name') + ')'}">name</b>
                 </div>
+
+                <br />
+                <span th:if="${node.getConceptReference() != null}" th:text="${node.getConceptReference().getUID()}">conceptReference</span>
+            </div>
+
+            <div class="nested nodeContent">
+                <div th:if="${nodeEmpty}">
+                    No roles.
+                </div>
+                <table th:if="${!node.getPropertyRoles.isEmpty}">
+                    <thead>
+                        <tr>
+                            <th>PropertyRole</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tr th:each="propertyRole : ${node.getPropertyRoles}">
+                        <td th:text="${propertyRole}">role</td>
+                        <td th:text="${node.getPropertyValue(propertyRole)}">value</td>
+                    </tr>
+                </table>
+                <table class="referenceRoles" th:if="${!node.getReferenceRoles.isEmpty}">
+                    <thead>
+                        <tr>
+                            <th>ReferenceRole</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tr th:each="referenceRole : ${node.getReferenceRoles}">
+                        <td th:text="${referenceRole}">referenceRole</td>
+<!--                            <td th:text="${@org.modelix.model.api.INodeReferenceSerializerKt@serialize(node.getReferenceTargetRef(referenceRole))}">target</td>-->
+                    </tr>
+                </table>
+                <ul class="nodeTree" th:each="child : ${node.allChildren}">
+                    <li th:replace="fragments/node_item :: nodeItem (${child})">child</li>
+                </ul>
             </div>
         </li>
     </ul>
-
 </html>

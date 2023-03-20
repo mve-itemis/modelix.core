@@ -43,7 +43,7 @@
 <h1>Model Server Content</h1>
 <button id="expandAllBtn" type="button">Expand all</button>
 <button id="collapseAllBtn" type="button">Collapse all</button>
-<ul class="nodeTree">
+<ul class="treeRoot">
     <div th:each="rootNode : ${rootNodes}">
         <div th:each="child : ${rootNode.allChildren}">
             <div th:replace="fragments/node_item :: nodeItem (node=${child})">
