@@ -4,6 +4,7 @@
     <meta charset=utf-8>
     <title>Content Explorer</title>
     <link rel="stylesheet" type="text/css" th:href="@{style.css}">
+    <style th:replace="fragments/menu_bar :: menuStyle"></style>
     <script language="javascript" type="text/javascript">
     document.addEventListener("DOMContentLoaded", () => {
         var expander = document.getElementsByClassName("expander");
@@ -40,6 +41,9 @@
     </script>
 </head>
 <body>
+<ul th:replace="fragments/menu_bar :: menu ('content')">
+    <span>MENU BAR</span>
+</ul>
 <h1>Model Server Content</h1>
 <button id="expandAllBtn" type="button">Expand all</button>
 <button id="collapseAllBtn" type="button">Collapse all</button>

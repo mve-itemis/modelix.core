@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <style th:fragment="menuStyle">
+    .menuList {
+        list-style-type: none;
+        margin: 0;
+        padding: 8px;
+        text-align: center;
+        overflow: hidden;
+        background-color: #282828;
+        border-radius: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .menuItem {
+        float: left;
+        font-family: sans-serif;
+        font-size: 14pt;
+        background-color: #282828;
+        margin-right: 5px;
+    }
+    .menuItem > a {
+        display: block;
+        text-decoration: none;
+        color: #ffffff;
+        text-align: center;
+        padding: 12px 20px;
+        background-color: #282828;
+        border-radius: 10px;
+    }
+    .menuItem > a:hover{
+        background-color: #404040;
+    }
+    .menuItemActive > a {
+        background-color: #606060;
+        background-color: #6290c3;
+    }
+    </style>
+</head>
+<body>
+  <ul class="menuList" th:fragment="menu (activeItem)" th:with="menuItems=${
+  #{'history' : 'History', 'content' : 'Content', 'json' : 'JSON API', 'headers' : 'HTTP Headers', 'user': 'JWT token and permissions'} }">
+    <li class="menuItem" th:classappend="${activeItem == 'root' ? 'menuItemActive' : ''}">
+          <a href="/">Model Server</a>
+      </li>
+      <li th:each="entry: ${menuItems}" class="menuItem" th:classappend="${activeItem == entry.key ? 'menuItemActive' : ''}">
+         <a th:href="'/' + ${entry.key}" th:text="${entry.value}">Menu Item</a>
+     </li>
+  </ul>
+</body>
+</html>
