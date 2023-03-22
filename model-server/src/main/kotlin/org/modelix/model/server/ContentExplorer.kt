@@ -55,10 +55,13 @@ class ContentExplorer(private val client: IModelClient) {
                 }
 
                 model["rootNodes"] = nodeList
-                call.respond(ThymeleafContent("content_explorer", model))
+                call.respond(ThymeleafContent("content", model))
             }
-            get("/content/style.css") {
-                call.respondFile(File("src/main/resources/templates/style.css"))
+            get("/content.css") {
+                call.respondFile(File("src/main/resources/templates/content.css"))
+            }
+            get("/content/content.css") {
+                call.respondFile(File("src/main/resources/templates/content.css"))
             }
         }
     }
