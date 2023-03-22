@@ -1,0 +1,25 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>HTTP Headers</title>
+    <style>
+        h1 {
+            font-family: sans-serif;
+        }
+        span {
+            font-family: monospace;
+        }
+    </style>
+    <style th:replace="fragments/menu_bar :: menuStyle"></style>
+</head>
+<body>
+<ul th:replace="fragments/menu_bar :: menu (activeItem='headers')"></ul>
+<h1>
+    HTTP Headers
+</h1>
+<div th:each="header : ${headers}">
+    <span th:text="${header.first}+ ': '">first: </span>
+    <span th:text="${header.second}">second</span>
+    <br />
+</div>
+</body>
+</html>

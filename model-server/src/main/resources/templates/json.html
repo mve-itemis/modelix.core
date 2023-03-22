@@ -1,0 +1,43 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Modelix Model Server</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+    </style>
+    <style th:replace="fragments/menu_bar :: menuStyle"></style>
+</head>
+<body>
+<ul th:replace="fragments/menu_bar :: menu (activeItem='json')"></ul>
+<h1>
+    JSON API
+</h1>
+<table>
+    <tr>
+        <td>GET /{repositoryId}/</td>
+        <td>Returns the model content of the latest version on the master branch.</td>
+    </tr>
+    <tr>
+        <td>GET /{repositoryId}/{versionHash}/</td>
+        <td>Returns the model content of the specified version on the master branch.</td>
+    </tr>
+    <tr>
+        <td>GET /{repositoryId}/{versionHash}/poll</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>POST /{repositoryId}/init</td>
+        <td>Initializes a new repository.</td>
+    </tr>
+    <tr>
+        <td>POST /{repositoryId}/{versionHash}/update</td>
+        <td>Applies the delta to the specified version of the model and merges it into the master branch. Return the model content after the merge.</td>
+    </tr>
+    <tr>
+        <td>WEBSOCKET /{repositoryId}/ws</td>
+        <td>WebSocket for exchanging model deltas.</td>
+    </tr>
+</table>
+</body>
+</html>

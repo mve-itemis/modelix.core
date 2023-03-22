@@ -166,37 +166,7 @@ object Main {
                 modelReplicationServer.init(this)
                 routing {
                     get("/") {
-                        call.respondHtml {
-                            head {
-                                style { +"""
-                                    table {
-                                        border-collapse: collapse;
-                                    }
-                                    td, th {
-                                        border: 1px solid #888;
-                                        padding: 3px 12px;
-                                    }
-                                """.trimIndent() }
-                            }
-                            body {
-                                div { +"Model Server" }
-                                br {}
-                                ul {
-                                    li {
-                                        a("history/") { +"Model History" }
-                                    }
-                                    li {
-                                        a("json/") { +"JSON API for JavaScript clients" }
-                                    }
-                                    li {
-                                        a("headers") { +"View HTTP headers" }
-                                    }
-                                    li {
-                                        a("user") { +"View JWT token and permissions" }
-                                    }
-                                }
-                            }
-                        }
+                        call.respond(ThymeleafContent("index", mapOf()))
                         call.respondText("Model Server")
                     }
                 }

@@ -22,6 +22,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.thymeleaf.*
 import io.ktor.util.pipeline.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -93,7 +94,8 @@ class KeyValueLikeModelServer(val storeClient: IStoreClient) {
             }
             get("/headers") {
                 val headers = call.request.headers.entries().flatMap { e -> e.value.map { e.key to it } }
-                call.respondText(headers.joinToString("\n") { "${it.first}: ${it.second}" })
+                val model = mapOf("headers" to headers)
+                call.respond(ThymeleafContent("headers", model))
             }
             requiresPermission(PERMISSION_MODEL_SERVER, EPermissionType.READ) {
                 get("/get/{key}") {

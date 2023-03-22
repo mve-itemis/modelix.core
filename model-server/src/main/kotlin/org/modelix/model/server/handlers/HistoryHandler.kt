@@ -1,11 +1,11 @@
 package org.modelix.model.server.handlers
 
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.apache.commons.lang3.StringEscapeUtils
+import io.ktor.server.thymeleaf.*
+import org.apache.cxf.transport.commons_text.StringEscapeUtils
 import org.modelix.authorization.KeycloakScope
 import org.modelix.authorization.asResource
 import org.modelix.authorization.getUserName
@@ -24,19 +24,30 @@ import org.modelix.model.operations.RevertToOp
 import org.modelix.model.operations.applyOperation
 import org.modelix.model.persistent.CPVersion.Companion.DESERIALIZER
 import java.io.PrintWriter
+import java.io.StringWriter
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.collections.HashSet
+import kotlin.collections.MutableSet
+import kotlin.collections.Set
+import kotlin.collections.emptySet
+import kotlin.collections.joinToString
+import kotlin.collections.map
+import kotlin.collections.mapOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
+import kotlin.collections.toTypedArray
 
 class HistoryHandler(private val client: IModelClient) {
 
     fun init(application: Application) {
         application.routing {
             get("/history/") {
-                call.respondTextWriter(contentType = ContentType.Text.Html) {
-                    buildMainPage(PrintWriter(this))
-                }
+                val model = mutableMapOf<String, Any>()
+                model["repoUrlsAndNames"] = knownRepositoryIds.map { "${escapeURL(it.repository)}/${escapeURL(it.branch)}/" to it }
+                call.respond(ThymeleafContent("history", model))
             }
             get("/history/{repoId}/{branch}/") {
                 val repositoryId = call.parameters["repoId"]!!
@@ -44,9 +55,10 @@ class HistoryHandler(private val client: IModelClient) {
                 val params = call.request.queryParameters
                 val limit = toInt(params["limit"], 500)
                 val skip = toInt(params["skip"], 0)
-                call.respondTextWriter(contentType = ContentType.Text.Html) {
-                    buildRepositoryPage(PrintWriter(this), RepositoryAndBranch(repositoryId, branch), params["head"], skip, limit)
-                }
+                val stringWriter = StringWriter()
+                buildRepositoryHistory(PrintWriter(stringWriter), RepositoryAndBranch(repositoryId, branch), params["head"], skip, limit)
+                val model = mapOf("repoHistory" to stringWriter.toString())
+                call.respond(ThymeleafContent("history_repository", model))
             }
             requiresPermission("history".asResource(), KeycloakScope.WRITE) {
                 post("/history/{repoId}/{branch}/revert") {
@@ -110,104 +122,7 @@ class HistoryHandler(private val client: IModelClient) {
             return result
         }
 
-    fun buildMainPage(out: PrintWriter) {
-        val content = if (knownRepositoryIds.isEmpty()) {
-            "<p><i>No repositories available, add one</i></p>"
-        } else {
-            """<ul>
-                | ${knownRepositoryIds.map { repositoryAndBranch -> """
-                <li>
-                    <a href='${escapeURL(repositoryAndBranch.repository)}/${escapeURL(repositoryAndBranch.branch)}/'>${escape(repositoryAndBranch.toString())}</a>
-                </li>
-                """ }.joinToString("\n")}
-                |</ul>
-            """.trimMargin()
-        }
-
-        out.append("""
-            <html>
-                <head>
-                    <style>
-                    </style>
-                </head>
-                <body>
-                    <h1>Choose Repository</h1>
-                    $content
-                </body>
-            </html>
-            """)
-    }
-
-    protected fun buildRepositoryPage(out: PrintWriter, repositoryAndBranch: RepositoryAndBranch, headHash: String?, skip: Int, limit: Int) {
-        out.append("""
-            <html>
-            <head>
-            <style>
-                table {
-                  border-collapse: collapse;
-                  font-family: sans-serif;
-                  margin: 25px 0;
-                  font-size: 0.9em;
-                  border-radius:6px;
-                }
-                thead tr {
-                  background-color: #009879;
-                  color: #ffffff;
-                  text-align: left;
-                }
-                th {
-                  padding: 12px 15px;
-                }
-                td {
-                  padding: 3px 15px;
-                }
-                tbody tr {
-                  border-bottom: 1px solid #dddddd;
-                  border-left: 1px solid #dddddd;
-                  border-right: 1px solid #dddddd;
-                }
-                tbody tr:nth-of-type(even) {
-                  background-color: #f3f3f3;
-                }
-                tbody tr:last-of-type
-                  border-bottom: 2px solid #009879;
-                }
-                tbody tr.active-row {
-                  font-weight: bold;
-                  color: #009879;
-                }
-                ul {
-                  padding-left: 15px;
-                }
-                .hash {
-                  color: #888;
-                }
-                .BtnGroup {
-                  display: inline-block;
-                  vertical-align: middle;
-                }
-                .BtnGroup-item {
-                  background-color: #f6f8fa;
-                  border: 1px solid rgba(27,31,36,0.15);
-                  padding: 5px 16px;
-                  position: relative;
-                  float: left;
-                  border-right-width: 0;
-                  border-radius: 0;
-                }
-                .BtnGroup-item:first-child {
-                  border-top-left-radius: 6px;
-                  border-bottom-left-radius: 6px;
-                }
-                .BtnGroup-item:last-child {
-                  border-right-width: 1px;
-                  border-top-right-radius: 6px;
-                  border-bottom-right-radius: 6px;
-                }
-            </style>
-            </head>
-            <body>
-            """)
+    private fun buildRepositoryHistory(out: PrintWriter, repositoryAndBranch: RepositoryAndBranch, headHash: String?, skip: Int, limit: Int) {
         val latestVersion = CLVersion(client[repositoryAndBranch.branchKey]!!, client.storeCache!!)
         val headVersion = if (headHash == null || headHash.length == 0) latestVersion else CLVersion(headHash, client.storeCache!!)
         var version: CLVersion? = headVersion
@@ -262,8 +177,7 @@ class HistoryHandler(private val client: IModelClient) {
         }
         out.append("</tbody></table>")
         buttons.run()
-        out.append("</body>")
-        out.append("</html>")
+
     }
 
     fun createTableRow(out: PrintWriter, version: CLVersion, latestVersion: CLVersion) {

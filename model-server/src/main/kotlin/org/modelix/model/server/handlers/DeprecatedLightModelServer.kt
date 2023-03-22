@@ -15,19 +15,15 @@ package org.modelix.model.server.handlers
 
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.html.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.thymeleaf.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.html.body
-import kotlinx.html.table
-import kotlinx.html.td
-import kotlinx.html.tr
 import org.json.JSONArray
 import org.json.JSONObject
 import org.modelix.authorization.KeycloakScope
@@ -71,41 +67,7 @@ class DeprecatedLightModelServer(val client: LocalModelClient) {
 
     private fun Route.initRouting() {
         get("/") {
-            call.respondHtml(HttpStatusCode.OK) {
-                body {
-                    table {
-                        tr {
-                            td { +"GET /{repositoryId}/" }
-                            td { + "Returns the model content of the latest version on the master branch." }
-                        }
-                        tr {
-                            td { +"GET /{repositoryId}/{versionHash}/" }
-                            td { + "Returns the model content of the specified version on the master branch." }
-                        }
-                        tr {
-                            td { +"GET /{repositoryId}/{versionHash}/poll" }
-                            td { + "" }
-                        }
-                        tr {
-                            td { +"POST /{repositoryId}/init" }
-                            td { + "Initializes a new repository." }
-                        }
-                        tr {
-                            td { +"POST /{repositoryId}/{versionHash}/update" }
-                            td {
-                                + "Applies the delta to the specified version of the model and merges"
-                                +" it into the master branch. Return the model content after the merge."
-                            }
-                        }
-                        tr {
-                            td { +"WEBSOCKET /{repositoryId}/ws" }
-                            td {
-                                + "WebSocket for exchanging model deltas."
-                            }
-                        }
-                    }
-                }
-            }
+            call.respond(HttpStatusCode.OK, ThymeleafContent("json", mapOf()))
         }
         get("/{repositoryId}/") {
             val repositoryId = RepositoryId(call.parameters["repositoryId"]!!)

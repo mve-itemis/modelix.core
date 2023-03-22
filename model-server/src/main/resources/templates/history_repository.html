@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    table {
+      border-collapse: collapse;
+      font-family: sans-serif;
+      margin: 25px 0;
+      font-size: 0.9em;
+      border-radius:6px;
+    }
+    thead tr {
+      background-color: #009879;
+      color: #ffffff;
+      text-align: left;
+    }
+    th {
+      padding: 12px 15px;
+    }
+    td {
+      padding: 3px 15px;
+    }
+    tbody tr {
+      border-bottom: 1px solid #dddddd;
+      border-left: 1px solid #dddddd;
+      border-right: 1px solid #dddddd;
+    }
+    tbody tr:nth-of-type(even) {
+      background-color: #f3f3f3;
+    }
+    tbody tr:last-of-type
+      border-bottom: 2px solid #009879;
+    }
+    tbody tr.active-row {
+      font-weight: bold;
+      color: #009879;
+    }
+    ul {
+      padding-left: 15px;
+    }
+    .hash {
+      color: #888;
+    }
+    .BtnGroup {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .BtnGroup-item {
+      background-color: #f6f8fa;
+      border: 1px solid rgba(27,31,36,0.15);
+      padding: 5px 16px;
+      position: relative;
+      float: left;
+      border-right-width: 0;
+      border-radius: 0;
+    }
+    .BtnGroup-item:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+    .BtnGroup-item:last-child {
+      border-right-width: 1px;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+  </style>
+  <style th:replace="fragments/menu_bar :: menuStyle"></style>
+</head>
+<body>
+<ul th:replace="fragments/menu_bar :: menu (activeItem='history')"></ul>
+
+<div th:utext="${repoHistory}">
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>History</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+    </style>
+    <style th:replace="fragments/menu_bar :: menuStyle"></style>
+</head>
+<body>
+<ul th:replace="fragments/menu_bar :: menu (activeItem='history')"></ul>
+<h1>
+    History
+</h1>
+<h2>Choose Repository</h2>
+<span th:if="${repoUrlsAndNames.isEmpty}">No repositories available, add one.</span>
+<div th:if="${!repoUrlsAndNames.isEmpty}">
+    <ul>
+        <li th:each="urlAndName : ${repoUrlsAndNames}">
+            <a th:href="'/history/'+${urlAndName.first}" th:text="${urlAndName.second}">repository</a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
