@@ -34,19 +34,18 @@
         background-color: #404040;
     }
     .menuItemActive > a {
-        background-color: #606060;
         background-color: #6290c3;
     }
     </style>
 </head>
 <body>
-  <ul class="menuList" th:fragment="menu (activeItem)" th:with="menuItems=${
-  #{'history' : 'History', 'content' : 'Content', 'json' : 'JSON API', 'headers' : 'HTTP Headers', 'user': 'JWT token and permissions'} }">
-    <li class="menuItem" th:classappend="${activeItem == 'root' ? 'menuItemActive' : ''}">
-          <a href="/">Model Server</a>
+  <ul class="menuList" th:fragment="menu (activeItem, baseUrl)" th:with="menuItems=${
+  #{'history/' : 'History', 'content/' : 'Content', 'json/' : 'JSON API', 'headers' : 'HTTP Headers', 'user': 'JWT token and permissions'} }">
+      <li class="menuItem" th:classappend="${activeItem == 'root' ? 'menuItemActive' : ''}">
+          <a th:href="${baseUrl}+'/'">Model Server</a>
       </li>
       <li th:each="entry: ${menuItems}" class="menuItem" th:classappend="${activeItem == entry.key ? 'menuItemActive' : ''}">
-         <a th:href="'/' + ${entry.key}" th:text="${entry.value}">Menu Item</a>
+         <a th:href="${baseUrl}+'/'+${entry.key}" th:text="${entry.value}">Menu Item</a>
      </li>
   </ul>
 </body>

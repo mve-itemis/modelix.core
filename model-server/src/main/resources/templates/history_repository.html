@@ -70,7 +70,7 @@
   <style th:replace="fragments/menu_bar :: menuStyle"></style>
 </head>
 <body>
-<ul th:replace="fragments/menu_bar :: menu (activeItem='history')"></ul>
+<ul th:replace="fragments/menu_bar :: menu (activeItem='history/', baseUrl='../../..')"></ul>
 
 <div th:utext="${repoHistory}">
 

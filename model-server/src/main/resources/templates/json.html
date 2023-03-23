@@ -9,7 +9,7 @@
     <style th:replace="fragments/menu_bar :: menuStyle"></style>
 </head>
 <body>
-<ul th:replace="fragments/menu_bar :: menu (activeItem='json')"></ul>
+<ul th:replace="fragments/menu_bar :: menu (activeItem='json/', baseUrl='..')"></ul>
 <h1>
     JSON API
 </h1>

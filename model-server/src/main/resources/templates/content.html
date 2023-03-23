@@ -41,7 +41,7 @@
     </script>
 </head>
 <body>
-<ul th:replace="fragments/menu_bar :: menu ('content')">
+<ul th:replace="fragments/menu_bar :: menu (activeItem='content', baseUrl='..')">
     <span>MENU BAR</span>
 </ul>
 <h1>Model Server Content</h1>
