@@ -11,7 +11,6 @@ import org.modelix.model.client.IModelClient
 import org.modelix.model.lazy.CLVersion
 import org.modelix.model.lazy.RepositoryId
 import org.modelix.model.metameta.MetaModelBranch
-import java.io.File
 
 class ContentExplorer(private val client: IModelClient) {
 
@@ -69,9 +68,6 @@ class ContentExplorer(private val client: IModelClient) {
                 } else {
                     call.respond(ThymeleafContent("fragments/node_inspector", mapOf("node" to found)))
                 }
-            }
-            get("/content/content.css") {
-                call.respondFile(File("src/main/resources/templates/content.css"))
             }
         }
     }
