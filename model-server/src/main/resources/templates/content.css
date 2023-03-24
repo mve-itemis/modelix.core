@@ -1,5 +1,6 @@
 body {
     font-family: sans-serif;
+
 }
 table {
   border-collapse: collapse;
@@ -33,56 +34,63 @@ tbody tr.active-row {
   font-weight: bold;
   color: #009879;
 }
-.expander::before {
-    content: "\25B6";
-    color: black;
-    display: inline-block;
-    margin-right: 6px;
-}
 .expander {
     cursor: pointer;
-    padding: 6px 12px;
-    font-size: 12pt;
+    margin-top: 12px;
+    font-size: 20px;
+    float: left;
 }
-
-.expander > span {
-    margin-left: 25px;
-    font-size: 9pt;
-}
-
-.expander-expanded::before {
+.expander-expanded {
     transition: .1s linear;
     transform: rotate(90deg);
-}
-.nodeContent {
-    margin-left: 15px;
-    margin-top: 10px;
+    transform-origin: center center;
 }
 .nested {
     display: none;
+    margin-left: 9px;
+    border-left: 1px solid #999999;
 }
 .active {
     display: block;
 }
 .nodeTree {
     list-style-type: none;
-    margin: 5px 0px;
-}
-.nodeContent > table {
-    margin-left: 22px;
 }
 .treeRoot {
     list-style-type: none;
-    margin: 5px;
+    margin-top: 5px;
+    float: left;
 }
 .referenceRoles {
     margin-top: 5px;
 }
 .nodeItem {
-    border-left: 1px solid #999999;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 10px;
 }
 .nameField {
-    display: inline;
+    margin-left: 30px;
+    padding: 5px;
+    border: 1px solid;
+    border-radius: 10px;
+    width: fit-content;
+    cursor: pointer;
+}
+.nameField:hover {
+    background-color: #e6e6e6;
+}
+.selectedNameField {
+    background-color: #c9c9c9;
+}
+#treeWrapper {
+    position: absolute;
+}
+#nodeInspector {
+    position: fixed;
+    top: 10%;
+    left: 65%;
+    width: 35%;
+    overflow-scroll;
+    z-index: 1;
+    display: none;
+    background-color: #ffffff;
 }

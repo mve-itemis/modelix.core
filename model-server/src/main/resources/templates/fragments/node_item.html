@@ -4,43 +4,17 @@
     </head>
     <ul>
         <li class="nodeItem" th:fragment="nodeItem (node)">
-            <div class="expander">
-                <div class="nameField" th:with="hasName=${#lists.contains(node.getPropertyRoles, 'name')}">
-                    <b th:text="${node}">node</b> <b th:if="${hasName}" th:text="' (' + ${node.getPropertyValue('name') + ')'}">name</b>
-                </div>
-
-                <br />
-                <span th:if="${node.getConceptReference() != null}" th:text="${node.getConceptReference().getUID()}">conceptReference</span>
+            <div class="expander" th:if="${!node.allChildren.isEmpty}">
+                &#x25B6;
             </div>
-
-            <div class="nested nodeContent">
-                <div th:if="${nodeEmpty}">
-                    No roles.
-                </div>
-                <table th:if="${!node.getPropertyRoles.isEmpty}">
-                    <thead>
-                        <tr>
-                            <th>PropertyRole</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tr th:each="propertyRole : ${node.getPropertyRoles}">
-                        <td th:text="${propertyRole}">role</td>
-                        <td th:text="${node.getPropertyValue(propertyRole)}">value</td>
-                    </tr>
-                </table>
-                <table class="referenceRoles" th:if="${!node.getReferenceRoles.isEmpty}">
-                    <thead>
-                        <tr>
-                            <th>ReferenceRole</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tr th:each="referenceRole : ${node.getReferenceRoles}">
-                        <td th:text="${referenceRole}">referenceRole</td>
-<!--                            <td th:text="${@org.modelix.model.api.INodeReferenceSerializerKt@serialize(node.getReferenceTargetRef(referenceRole))}">target</td>-->
-                    </tr>
-                </table>
+            <div class="nameField" th:attr="data-nodeid=${node.nodeId}" th:with="hasName=${#lists.contains(node.getPropertyRoles, 'name')}">
+                <b class="nodeName" th:if="${hasName}" th:text="${node.getPropertyValue('name')}">name</b>
+                <b th:if="${!hasName}">Unnamed Node</b>
+                <small th:text="'('+ ${node}+')'">node</small>
+                <br />
+                <small th:if="${node.getConceptReference() != null}" th:text="${node.getConceptReference().getUID()}">conceptReference</small>
+            </div>
+            <div class="nested">
                 <ul class="nodeTree" th:each="child : ${node.allChildren}">
                     <li th:replace="fragments/node_item :: nodeItem (${child})">child</li>
                 </ul>

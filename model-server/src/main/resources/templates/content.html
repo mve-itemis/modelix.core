@@ -6,10 +6,35 @@
     <link rel="stylesheet" type="text/css" href="content.css">
     <style th:replace="fragments/menu_bar :: menuStyle"></style>
     <script language="javascript" type="text/javascript">
+    async function createInspectorDetails(nodeId) {
+        let response = await window.fetch(window.location.href + nodeId + '/');
+        let nodeInspector = document.getElementById("nodeInspector");
+        nodeInspector.innerHTML = await response.text();
+        nodeInspector.style.display = "block";
+    }
     document.addEventListener("DOMContentLoaded", () => {
         var expander = document.getElementsByClassName("expander");
+        var nameField = document.getElementsByClassName("nameField");
         var expandAllBtn = document.getElementById("expandAllBtn");
         var collapseAllBtn = document.getElementById("collapseAllBtn");
+
+        for (let i = 0; i < nameField.length; i++) {
+            nameField[i].addEventListener("click", function() {
+                 let isSelected = this.classList.contains("selectedNameField");
+                 if (isSelected) {
+                    document.getElementById("nodeInspector").style.display = "none";
+                 } else {
+                    createInspectorDetails(this.dataset.nodeid);
+                 }
+                 let selected = document.getElementsByClassName("selectedNameField");
+                 for (let j = 0; j < selected.length; j++) {
+                    selected[j].classList.remove("selectedNameField");
+                 }
+                 if (!isSelected) {
+                    this.classList.add("selectedNameField");
+                 }
+            });
+        }
 
         for (let i = 0; i < expander.length; i++) {
             expander[i].addEventListener("click", function() {
@@ -41,21 +66,27 @@
     </script>
 </head>
 <body>
-<ul th:replace="fragments/menu_bar :: menu (activeItem='content', baseUrl='..')">
+<ul th:replace="fragments/menu_bar :: menu (activeItem='content/', baseUrl='..')">
     <span>MENU BAR</span>
 </ul>
 <h1>Model Server Content</h1>
 <button id="expandAllBtn" type="button">Expand all</button>
 <button id="collapseAllBtn" type="button">Collapse all</button>
-<ul class="treeRoot">
-    <div th:each="rootNode : ${rootNodes}">
-        <div th:each="child : ${rootNode.allChildren}">
-            <div th:replace="fragments/node_item :: nodeItem (node=${child})">
-                <span>[PlaceHolder]</span>
+<div id="treeWrapper">
+    <ul class="treeRoot">
+        <span th:if="${rootNodes.isEmpty}">No content available.</span>
+        <div th:each="rootNode : ${rootNodes}">
+            <div th:each="child : ${rootNode.allChildren}">
+                <div th:replace="fragments/node_item :: nodeItem (node=${child})">
+                    <span>[PlaceHolder]</span>
+                </div>
             </div>
         </div>
-    </div>
-</ul>
+    </ul>
+</div>
+<div id="nodeInspector">
+    [Inspector]
+</div>
 
 </body>
 </html>

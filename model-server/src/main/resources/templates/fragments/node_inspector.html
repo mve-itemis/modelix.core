@@ -1,0 +1,31 @@
+<div th:with="nodeEmpty=${node.getPropertyRoles.isEmpty && node.getReferenceRoles.isEmpty}" xmlns:th="http://www.w3.org/1999/xhtml">
+    <h3>Node Details</h3>
+    <div th:if="${nodeEmpty}">
+        No roles.
+    </div>
+    <table th:if="${!node.getPropertyRoles.isEmpty}">
+        <thead>
+        <tr>
+            <th>PropertyRole</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tr th:each="propertyRole : ${node.getPropertyRoles}">
+            <td th:text="${propertyRole}">role</td>
+            <td th:text="${node.getPropertyValue(propertyRole)}">value</td>
+        </tr>
+    </table>
+    <table class="referenceRoles" th:if="${!node.getReferenceRoles.isEmpty}">
+        <thead>
+        <tr>
+            <th>ReferenceRole</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tr th:each="referenceRole : ${node.getReferenceRoles}">
+            <td th:text="${referenceRole}">referenceRole</td>
+            <td>Not yet implemented</td>
+            <!--<td th:text="${@org.modelix.model.api.INodeReferenceSerializerKt@serialize(node.getReferenceTargetRef(referenceRole))}">target</td>-->
+        </tr>
+    </table>
+</div>

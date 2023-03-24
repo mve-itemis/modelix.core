@@ -36,30 +36,56 @@ class ContentExplorer(private val client: IModelClient) {
             return result
         }
 
+    private val rootNodes: List<PNodeAdapter>
+        get() {
+            val nodeList = mutableListOf<PNodeAdapter>()
+
+            for (repoID in knownRepositoryIds) {
+                val branchRef = RepositoryId(repoID.repository).getBranchReference()
+                val version = ModelFacade.loadCurrentVersion(client, branchRef) ?: continue
+                val rootNode = PNodeAdapter(ITree.ROOT_ID, TreePointer(version.tree))
+                nodeList.add(rootNode)
+            }
+            return nodeList
+        }
+
     fun init(application: Application) {
         application.routing {
             get("/content/") {
-                val model = mutableMapOf<String, Any>()
-                val nodeList = mutableListOf<INode>()
-
-                for (repoID in knownRepositoryIds) {
-                    val branchRef = RepositoryId(repoID.repository).getBranchReference()
-                    val version = ModelFacade.loadCurrentVersion(client, branchRef)
-                    if (version == null) {
-                        call.respond(HttpStatusCode.InternalServerError)
-                        return@get
+                call.respond(ThymeleafContent("content", mapOf("rootNodes" to rootNodes)))
+            }
+            get("/content/{nodeId}/") {
+                val id = call.parameters["nodeId"]!!.toLong()
+                var found: PNodeAdapter? = null
+                for (node in rootNodes) {
+                    val candidate = node.findChildRec(id)
+                    if (candidate != null) {
+                        found = candidate
+                        break
                     }
-
-                    val rootNode = PNodeAdapter(ITree.ROOT_ID, TreePointer(version.tree))
-                    nodeList.add(rootNode)
                 }
-
-                model["rootNodes"] = nodeList
-                call.respond(ThymeleafContent("content", model))
+                if (found == null) {
+                    call.respondText("node id not found", status = HttpStatusCode.InternalServerError)
+                } else {
+                    call.respond(ThymeleafContent("fragments/node_inspector", mapOf("node" to found)))
+                }
             }
             get("/content/content.css") {
                 call.respondFile(File("src/main/resources/templates/content.css"))
             }
         }
+    }
+
+    private fun PNodeAdapter.findChildRec(nodeId: Long) : PNodeAdapter? {
+        if (this.nodeId == nodeId)
+            return this
+
+        for (child in allChildren) {
+            val node = (child as PNodeAdapter).findChildRec(nodeId)
+            if (node != null) {
+                return node
+            }
+        }
+        return null
     }
 }
