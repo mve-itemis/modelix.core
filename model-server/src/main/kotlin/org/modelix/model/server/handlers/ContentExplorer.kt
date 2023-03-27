@@ -1,4 +1,4 @@
-package org.modelix.model.server
+package org.modelix.model.server.handlers
 
 import io.ktor.http.*
 import io.ktor.server.application.*

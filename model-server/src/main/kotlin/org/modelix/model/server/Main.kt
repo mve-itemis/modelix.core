@@ -19,7 +19,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import io.ktor.server.html.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
@@ -28,14 +27,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.thymeleaf.*
 import io.ktor.server.websocket.*
-import kotlinx.html.a
-import kotlinx.html.body
-import kotlinx.html.br
-import kotlinx.html.div
-import kotlinx.html.head
-import kotlinx.html.li
-import kotlinx.html.style
-import kotlinx.html.ul
 import org.apache.commons.io.FileUtils
 import org.apache.ignite.Ignition
 import org.modelix.authorization.KeycloakUtils
@@ -140,6 +131,13 @@ object Main {
                 installAuthentication(unitTestMode = !KeycloakUtils.isEnabled())
                 install(ForwardedHeaders)
                 install(WebSockets)
+                install(Thymeleaf) {
+                    setTemplateResolver(ClassLoaderTemplateResolver().apply {
+                        prefix = "templates/"
+                        suffix = ".html"
+                        characterEncoding = "utf-8"
+                    })
+                }
                 install(ContentNegotiation) {
                     json()
                 }
@@ -150,13 +148,6 @@ object Main {
                     allowMethod(HttpMethod.Get)
                     allowMethod(HttpMethod.Put)
                     allowMethod(HttpMethod.Post)
-                }
-                install(Thymeleaf) {
-                    setTemplateResolver(ClassLoaderTemplateResolver().apply {
-                        prefix = "templates/"
-                        suffix = ".html"
-                        characterEncoding = "utf-8"
-                    })
                 }
 
                 modelServer.init(this)
