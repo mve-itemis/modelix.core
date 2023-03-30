@@ -6,58 +6,62 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.thymeleaf.*
 import org.modelix.model.ModelFacade
-import org.modelix.model.api.*
+import org.modelix.model.api.ITree
+import org.modelix.model.api.PNodeAdapter
+import org.modelix.model.api.TreePointer
 import org.modelix.model.client.IModelClient
 import org.modelix.model.lazy.CLVersion
-import org.modelix.model.lazy.RepositoryId
-import org.modelix.model.metameta.MetaModelBranch
 
-class ContentExplorer(private val client: IModelClient) {
-
-    private val knownRepositoryIds: Set<HistoryHandler.RepositoryAndBranch>
-        get() {
-            val result: MutableSet<HistoryHandler.RepositoryAndBranch> = HashSet()
-            val infoVersionHash = client[RepositoryId("info").getBranchReference().getKey()] ?: return emptySet()
-            val infoVersion = CLVersion(infoVersionHash, client.storeCache)
-            val infoBranch: IBranch = MetaModelBranch(PBranch(infoVersion.tree, IdGeneratorDummy()))
-            infoBranch.runReadT { t: IReadTransaction ->
-                for (infoNodeId in t.getChildren(ITree.ROOT_ID, "info")) {
-                    for (repositoryNodeId in t.getChildren(infoNodeId, "repositories")) {
-                        val repositoryId = t.getProperty(repositoryNodeId, "id") ?: continue
-                        result.add(HistoryHandler.RepositoryAndBranch(repositoryId))
-                        for (branchNodeId in t.getChildren(repositoryNodeId, "branches")) {
-                            val branchName = t.getProperty(branchNodeId, "name") ?: continue
-                            result.add(HistoryHandler.RepositoryAndBranch(repositoryId, branchName))
-                        }
-                    }
-                }
-            }
-            return result
-        }
+class ContentExplorer(private val client: IModelClient, private val repoManager: RepositoriesManager) {
 
     private val rootNodes: List<PNodeAdapter>
         get() {
             val nodeList = mutableListOf<PNodeAdapter>()
 
-            for (repoID in knownRepositoryIds) {
-                val branchRef = RepositoryId(repoID.repository).getBranchReference()
+            for (repoId in repoManager.getRepositories()) {
+                val branchRef = repoId.getBranchReference()
                 val version = ModelFacade.loadCurrentVersion(client, branchRef) ?: continue
-                val rootNode = PNodeAdapter(ITree.ROOT_ID, TreePointer(version.tree))
+                val rootNode = PNodeAdapter(ITree.ROOT_ID, TreePointer(version.getTree()))
                 nodeList.add(rootNode)
             }
             return nodeList
         }
 
+    private val allVersions: Set<CLVersion>
+        get() {
+            val versions = linkedSetOf<CLVersion>()
+            for (repoId in repoManager.getRepositories()) {
+                val hash = repoManager.getVersionHash(repoId.getBranchReference()) ?: continue
+                val version = CLVersion(hash, client.storeCache)
+                var current: CLVersion? = version
+                while (current != null) {
+                    versions.add(current)
+                    current = current.baseVersion
+                }
+            }
+            return versions
+        }
+
     fun init(application: Application) {
         application.routing {
             get("/content/") {
-                call.respond(ThymeleafContent("content", mapOf("rootNodes" to rootNodes)))
+                call.respond(ThymeleafContent("content_overview", mapOf("allVersions" to allVersions)))
             }
-            get("/content/{nodeId}/") {
+            get("/content/{versionHash}/") {
+                val versionHash = call.parameters["versionHash"]
+                if (versionHash.isNullOrEmpty()) {
+                    call.respondText("version not found", status = HttpStatusCode.InternalServerError)
+                    return@get
+                }
+                val tree = CLVersion.loadFromHash(versionHash, client.storeCache).getTree()
+                val rootNode = PNodeAdapter(ITree.ROOT_ID, TreePointer(tree))
+                call.respond(ThymeleafContent("content", mapOf("rootNodes" to listOf(rootNode))))
+            }
+            get("/content/{versionHash}/{nodeId}/") {
                 val id = call.parameters["nodeId"]!!.toLong()
                 var found: PNodeAdapter? = null
                 for (node in rootNodes) {
-                    val candidate = node.findChildRec(id)
+                    val candidate = PNodeAdapter(id, node.branch).takeIf { it.isValid }
                     if (candidate != null) {
                         found = candidate
                         break
@@ -70,18 +74,5 @@ class ContentExplorer(private val client: IModelClient) {
                 }
             }
         }
-    }
-
-    private fun PNodeAdapter.findChildRec(nodeId: Long) : PNodeAdapter? {
-        if (this.nodeId == nodeId)
-            return this
-
-        for (child in allChildren) {
-            val node = (child as PNodeAdapter).findChildRec(nodeId)
-            if (node != null) {
-                return node
-            }
-        }
-        return null
     }
 }

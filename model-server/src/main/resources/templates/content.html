@@ -101,9 +101,9 @@
         background-color: #ffffff;
     }
     </style>
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript">
     async function createInspectorDetails(nodeId) {
-        let response = await window.fetch(window.location.href + nodeId + '/');
+        let response = await window.fetch(window.location.pathname + nodeId + '/');
         let nodeInspector = document.getElementById("nodeInspector");
         nodeInspector.innerHTML = await response.text();
         nodeInspector.style.display = "block";
@@ -162,7 +162,7 @@
     </script>
 </head>
 <body>
-<ul th:replace="fragments/menu_bar :: menu (activeItem='content/', baseUrl='..')">
+<ul th:replace="fragments/menu_bar :: menu (activeItem='content/', baseUrl='../..')">
     <span>MENU BAR</span>
 </ul>
 <h1>Model Server Content</h1>
